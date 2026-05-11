@@ -1,8 +1,10 @@
-name: Deploy TurboWarp Mirror
+name: Deploy
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 
 permissions:
   contents: write
@@ -12,17 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - name: Run Mirror Script
+      - name: Deploy
         run: python3 patch.py
-      - name: Upload Files
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: site-files
-          path: dist/
+          path: scratch-gui/build/
 
   deploy:
     runs-on: ubuntu-latest
